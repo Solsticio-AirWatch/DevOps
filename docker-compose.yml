@@ -1,0 +1,85 @@
+# =============================================================================
+# AirWatch - Docker Compose
+# Grupo Solsticio | FIAP 2026
+#
+# ✅ Dois containers na mesma rede
+# ✅ Nomes dos containers contêm o RM (RM565760)
+# ✅ Volume nomeado para persistência do banco
+# ✅ Variáveis de ambiente em ambos
+# ✅ Portas expostas em ambos
+# ✅ Execução em background (modo detached com -d)
+# =============================================================================
+
+version: "3.9"
+
+services:
+
+  # ── Container do Banco de Dados ─────────────────────────────────────────────
+  oracle-RM565760:
+    image: container-registry.oracle.com/database/express:21.3.0-xe
+    # ✅ Nome do container contém o RM
+    container_name: oracle-RM565760
+    restart: unless-stopped
+    # ✅ Variáveis de ambiente do banco
+    environment:
+      ORACLE_PWD: Oracle123!
+      ORACLE_CHARACTERSET: AL32UTF8
+    # ✅ Porta exposta para acesso externo ao banco
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    # ✅ Volume nomeado para persistência
+    volumes:
+      - oracle-data-RM565760:/opt/oracle/oradata
+    networks:
+      - airwatch-network
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'SELECT 1 FROM DUAL;' | sqlplus -s system/Oracle123!@//localhost:1521/XEPDB1"]
+      interval: 30s
+      timeout: 15s
+      retries: 15
+      start_period: 180s
+
+  # ── Container da Aplicação ───────────────────────────────────────────────────
+  airwatch-RM565760:
+    build:
+      context: ../../../../../../Downloads
+      dockerfile: Dockerfile
+    # ✅ Nome do container contém o RM
+    container_name: airwatch-RM565760
+    restart: unless-stopped
+    # ✅ Variáveis de ambiente da aplicação
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@//oracle-RM565760:1521/XEPDB1
+      SPRING_DATASOURCE_USERNAME: airwatch
+      SPRING_DATASOURCE_PASSWORD: airwatch123
+      AIRWATCH_JWT_SECRET: AirWatchSolsticioFIAP2026SecretKeyBase64EncodedMinimo256bits
+      AIRWATCH_JWT_EXPIRATION: 86400000
+      APP_NAME: AirWatch
+      SERVER_PORT: 8080
+    # ✅ Porta exposta para acesso à aplicação
+    ports:
+      - "8080:8080"
+    depends_on:
+      oracle-RM565760:
+        condition: service_healthy
+    networks:
+      - airwatch-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+# ✅ Volume nomeado
+volumes:
+  oracle-data-RM565760:
+    name: oracle-data-RM565760
+
+# ✅ Rede compartilhada entre os containers
+networks:
+  airwatch-network:
+    name: airwatch-network
+    driver: bridge

@@ -1,2 +1,4 @@
-/mvnw text eol=lf
+# Normaliza quebras de linha
+* text=auto
+*.sh text eol=lf
 *.cmd text eol=crlf
