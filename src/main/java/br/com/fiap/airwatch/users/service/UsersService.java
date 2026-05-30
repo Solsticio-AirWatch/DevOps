@@ -7,7 +7,6 @@ import br.com.fiap.airwatch.users.model.Users;
 import br.com.fiap.airwatch.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
-import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,6 @@ public class UsersService implements UserDetailsService {
     private final CityService cityService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final AuthenticationManager authManager;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -29,10 +27,8 @@ public class UsersService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }
 
-    public AuthResponse authenticate(AuthRequest req) {
-        authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.email(), req.password()));
-        var user = repo.findByEmail(req.email()).orElseThrow();
+    public AuthResponse buildAuthResponse(String email) {
+        var user = repo.findByEmail(email).orElseThrow();
         user.setLastLoginAt(LocalDateTime.now());
         repo.save(user);
         return new AuthResponse(jwtService.generateToken(user), user.getEmail(), user.getRole());

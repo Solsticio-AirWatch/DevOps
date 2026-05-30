@@ -1,5 +1,7 @@
 package br.com.fiap.airwatch.users.model;
 import br.com.fiap.airwatch.city.model.City;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +22,7 @@ public class Users implements UserDetails {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_city")
+    @JsonIgnoreProperties("users")
     private City city;
 
     @Column(name = "name", nullable = false, length = 150)
