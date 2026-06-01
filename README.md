@@ -390,9 +390,9 @@ airwatch/
 
 | RM | Nome | Turma |
 |---|---|---|
-| RM565760 | (seu nome) | 2TDS |
-| RM | (nome) | 2TDS |
-| RM | (nome) | 2TDS |
+| RM565760 | Enrico Delesporte | 2TDS |
+| RM561810 | Felipe Modesto | 2TDS |
+| RM565422 | Vitor Dias | 2TDS |
 
 ---
 
