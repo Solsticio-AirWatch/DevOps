@@ -384,6 +384,8 @@ airwatch/
 9. Demonstrar CRUD completo no Swagger: `http://IP_DA_VM:8080/swagger-ui.html`
 10. Mostrar persistência: criar registro no Swagger → SELECT no banco
 
+Link do video: https://youtu.be/dHl18J7nS28
+
 ---
 
 ## 👥 Grupo Solsticio
